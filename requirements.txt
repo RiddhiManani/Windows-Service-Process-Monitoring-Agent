@@ -1,0 +1,31 @@
+# Windows Service & Process Monitoring Agent
+# Requirements — install with: pip install -r requirements.txt
+# Requires Python 3.12+ on Windows 10/11
+# Run as Administrator for full visibility
+
+# ── System & Process Monitoring ──────────────────────────────────────────
+psutil==5.9.8
+pywin32==306
+wmi==1.5.1
+
+# ── File System Watching ─────────────────────────────────────────────────
+watchdog==4.0.0
+
+# ── Terminal / Console Output ────────────────────────────────────────────
+rich==13.7.1
+colorama==0.4.6
+tabulate==0.9.0
+
+# ── Data Handling ────────────────────────────────────────────────────────
+pandas==2.2.2
+openpyxl==3.1.2
+
+# ── Charting & Visualisation ─────────────────────────────────────────────
+matplotlib==3.9.0
+
+# ── PDF Report Generation ────────────────────────────────────────────────
+reportlab==4.2.0
+Pillow==10.3.0
+
+# ── Optional: Build standalone executable ────────────────────────────────
+# pyinstaller==6.6.0
