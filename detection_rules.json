@@ -1,0 +1,210 @@
+{
+    "description": "Detection rules for suspicious process and service behavior",
+    "version": "1.0.0",
+    "rules": [
+        {
+            "id": "RULE-001",
+            "name": "Office Spawning Shell",
+            "description": "Office application spawning a command shell or scripting engine",
+            "category": "Suspicious Parent-Child",
+            "severity": "Critical",
+            "enabled": true,
+            "parent_processes": ["winword.exe", "excel.exe", "powerpnt.exe", "outlook.exe", "onenote.exe", "msaccess.exe", "mspub.exe"],
+            "child_processes": ["cmd.exe", "powershell.exe", "powershell_ise.exe", "wscript.exe", "cscript.exe", "mshta.exe", "wmic.exe", "certutil.exe", "regsvr32.exe", "rundll32.exe"],
+            "mitre_technique": "T1566",
+            "recommendation": "Investigate the Office document and quarantine. Possible phishing or macro attack."
+        },
+        {
+            "id": "RULE-002",
+            "name": "PowerShell Spawning CMD",
+            "description": "PowerShell launching cmd.exe (common in multi-stage attacks)",
+            "category": "Suspicious Parent-Child",
+            "severity": "High",
+            "enabled": true,
+            "parent_processes": ["powershell.exe", "powershell_ise.exe"],
+            "child_processes": ["cmd.exe", "wscript.exe", "cscript.exe", "mshta.exe"],
+            "mitre_technique": "T1059.001",
+            "recommendation": "Review PowerShell command history and script blocks for malicious activity."
+        },
+        {
+            "id": "RULE-003",
+            "name": "MSHTA Spawning Shell",
+            "description": "mshta.exe launching a shell process (used in LOLBin attacks)",
+            "category": "LOLBin Abuse",
+            "severity": "Critical",
+            "enabled": true,
+            "parent_processes": ["mshta.exe"],
+            "child_processes": ["cmd.exe", "powershell.exe", "wscript.exe", "cscript.exe"],
+            "mitre_technique": "T1218.005",
+            "recommendation": "Terminate mshta.exe and investigate HTA files."
+        },
+        {
+            "id": "RULE-004",
+            "name": "Explorer Spawning Script",
+            "description": "explorer.exe launching scripting engines (unexpected behavior)",
+            "category": "Suspicious Parent-Child",
+            "severity": "High",
+            "enabled": true,
+            "parent_processes": ["explorer.exe"],
+            "child_processes": ["wscript.exe", "cscript.exe", "mshta.exe", "powershell.exe"],
+            "mitre_technique": "T1059",
+            "recommendation": "Check recently opened files and shortcut (LNK) files."
+        },
+        {
+            "id": "RULE-005",
+            "name": "Suspicious Process from Temp",
+            "description": "Executable running from Windows Temp directory",
+            "category": "Path-Based Detection",
+            "severity": "High",
+            "enabled": true,
+            "suspicious_paths": ["\\temp\\", "\\tmp\\", "/temp/", "/tmp/"],
+            "mitre_technique": "T1036",
+            "recommendation": "Investigate the executable in the temp folder. Possibly a dropped payload."
+        },
+        {
+            "id": "RULE-006",
+            "name": "Process from Downloads",
+            "description": "Executable running directly from Downloads folder",
+            "category": "Path-Based Detection",
+            "severity": "Medium",
+            "enabled": true,
+            "suspicious_paths": ["\\downloads\\"],
+            "mitre_technique": "T1204",
+            "recommendation": "Verify the file source. Users should not execute files directly from Downloads."
+        },
+        {
+            "id": "RULE-007",
+            "name": "Process from Recycle Bin",
+            "description": "Executable running from Recycle Bin (very suspicious)",
+            "category": "Path-Based Detection",
+            "severity": "Critical",
+            "enabled": true,
+            "suspicious_paths": ["\\$recycle.bin\\", "\\recycler\\"],
+            "mitre_technique": "T1036.005",
+            "recommendation": "Immediately terminate and quarantine. Malware hiding in Recycle Bin."
+        },
+        {
+            "id": "RULE-008",
+            "name": "Unsigned Process",
+            "description": "Process executable is not digitally signed",
+            "category": "Code Integrity",
+            "severity": "Medium",
+            "enabled": true,
+            "mitre_technique": "T1553.002",
+            "recommendation": "Verify the process identity and origin. Unsigned executables may indicate tampering."
+        },
+        {
+            "id": "RULE-009",
+            "name": "Service from Temp Folder",
+            "description": "Windows service binary located in a Temp folder",
+            "category": "Service Abuse",
+            "severity": "Critical",
+            "enabled": true,
+            "suspicious_service_paths": ["\\temp\\", "\\tmp\\"],
+            "mitre_technique": "T1543.003",
+            "recommendation": "Stop and delete the service. Investigate the binary immediately."
+        },
+        {
+            "id": "RULE-010",
+            "name": "New Startup Entry",
+            "description": "New entry detected in startup locations",
+            "category": "Persistence",
+            "severity": "High",
+            "enabled": true,
+            "mitre_technique": "T1547.001",
+            "recommendation": "Review new startup entries. Could be persistence mechanism installed by malware."
+        },
+        {
+            "id": "RULE-011",
+            "name": "WMIC Spawning Process",
+            "description": "wmic.exe spawning child processes (used in lateral movement)",
+            "category": "LOLBin Abuse",
+            "severity": "High",
+            "enabled": true,
+            "parent_processes": ["wmic.exe"],
+            "child_processes": ["cmd.exe", "powershell.exe", "mshta.exe"],
+            "mitre_technique": "T1047",
+            "recommendation": "Review WMI subscriptions and WMIC command history."
+        },
+        {
+            "id": "RULE-012",
+            "name": "Certutil Downloading Files",
+            "description": "certutil.exe spawned by non-system process (often used to download payloads)",
+            "category": "LOLBin Abuse",
+            "severity": "High",
+            "enabled": true,
+            "parent_processes": ["cmd.exe", "powershell.exe", "wscript.exe"],
+            "child_processes": ["certutil.exe"],
+            "mitre_technique": "T1140",
+            "recommendation": "Check certutil usage and any downloaded files."
+        },
+        {
+            "id": "RULE-013",
+            "name": "Regsvr32 Abuse",
+            "description": "regsvr32.exe used as a LOLBin to bypass application whitelisting",
+            "category": "LOLBin Abuse",
+            "severity": "High",
+            "enabled": true,
+            "parent_processes": ["cmd.exe", "powershell.exe", "wscript.exe", "mshta.exe"],
+            "child_processes": ["regsvr32.exe"],
+            "mitre_technique": "T1218.010",
+            "recommendation": "Investigate regsvr32 command line arguments for scriptlet abuse."
+        },
+        {
+            "id": "RULE-014",
+            "name": "High CPU Usage Process",
+            "description": "Process consuming abnormally high CPU (possible cryptominer)",
+            "category": "Behavior-Based",
+            "severity": "Medium",
+            "enabled": true,
+            "cpu_threshold": 80,
+            "mitre_technique": "T1496",
+            "recommendation": "Investigate high CPU process. Could be crypto mining malware."
+        },
+        {
+            "id": "RULE-015",
+            "name": "Disabled Security Service",
+            "description": "Windows security service found disabled",
+            "category": "Service Tampering",
+            "severity": "Critical",
+            "enabled": true,
+            "protected_services": ["WinDefend", "MpsSvc", "wscsvc", "SecurityHealthService", "EventLog", "WdNisSvc"],
+            "mitre_technique": "T1562.001",
+            "recommendation": "Re-enable security services immediately. System is potentially compromised."
+        },
+        {
+            "id": "RULE-016",
+            "name": "RunDLL32 Abuse",
+            "description": "rundll32.exe used to load potentially malicious DLL",
+            "category": "LOLBin Abuse",
+            "severity": "Medium",
+            "enabled": true,
+            "parent_processes": ["cmd.exe", "powershell.exe", "wscript.exe"],
+            "child_processes": ["rundll32.exe"],
+            "mitre_technique": "T1218.011",
+            "recommendation": "Inspect rundll32 command line for suspicious DLL loading."
+        },
+        {
+            "id": "RULE-017",
+            "name": "Process from Public Folder",
+            "description": "Executable running from C:\\Users\\Public",
+            "category": "Path-Based Detection",
+            "severity": "High",
+            "enabled": true,
+            "suspicious_paths": ["c:\\users\\public\\"],
+            "mitre_technique": "T1036.005",
+            "recommendation": "Investigate process in Public folder. Common lateral movement staging location."
+        },
+        {
+            "id": "RULE-018",
+            "name": "Script Running from AppData",
+            "description": "Script or executable running from AppData",
+            "category": "Path-Based Detection",
+            "severity": "Medium",
+            "enabled": true,
+            "suspicious_paths": ["\\appdata\\"],
+            "mitre_technique": "T1036",
+            "recommendation": "Review process in AppData. Malware often hides here to evade detection."
+        }
+    ]
+}
