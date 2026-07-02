@@ -132,7 +132,7 @@ WindowsServiceProcessMonitoringAgent/
 
 ### Step 1 — Clone the repository
 ```bash
-git clone https://github.com/yourusername/WindowsServiceProcessMonitoringAgent.git
+git clone https://github.com/RiddhiManani/Windows-Service-Process-Monitoring-Agent.git
 cd WindowsServiceProcessMonitoringAgent
 ```
 
@@ -280,8 +280,4 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 **Security Research Team**
 Built for cybersecurity portfolio, academic submission, and Blue Team operations.
 
----
 
-<p align="center">
-  <strong>⭐ Star this repository if it helped you!</strong>
-</p>
